@@ -14,10 +14,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pro.sky.telegrambot.model.NotificationModel;
 import pro.sky.telegrambot.service.NotificationService;
+import pro.sky.telegrambot.texts.CommandsAndTexts.*;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static pro.sky.telegrambot.texts.CommandsAndTexts.*;
 
 
 @Service
@@ -26,9 +29,10 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
 
     private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
 
-    private static final String START_CMD = "/start";
-    private static final String WELCOME_TEXT = "Welcome to Notification BOT";
-    private static final String INVALID_NOTIFICATION_OR_CMD = "Something went wrong, please try again!";
+//    private static final String START_CMD = "/start";
+//    private static final String WELCOME_TEXT = "Welcome to Notification BOT";
+//    private static final String HELP_CMD = "/help";
+//    private static final String INVALID_NOTIFICATION_OR_CMD = "Something went wrong, please try again!";
 
     @Autowired
     private TelegramBot telegramBot;
@@ -60,9 +64,12 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (message.text().startsWith(START_CMD)) {
                 logger.info(START_CMD + " command has been received at " + LocalDateTime.now());
                 sendMessage(extractChatId(message), "Welcome to notification Bot, " + message.from().firstName() + " ");
+            } else if (message.text().startsWith(HELP_CMD)) {
+                logger.info(HELP_CMD + " command has been received at " + LocalDateTime.now());
+                sendMessage(extractChatId(message), HELP_TEXT);
             } else {
                 notificationService.parseMessage(message.text()).ifPresentOrElse(
-                       task -> scheduledNotification(extractChatId(message), task),
+                        task -> scheduledNotification(extractChatId(message), task),
                         () -> sendMessage(extractChatId(message), INVALID_NOTIFICATION_OR_CMD)
                 );
             }
